@@ -1,0 +1,12 @@
+---
+- name: Playbook to manage creating host-file
+  hosts: all
+  tasks:
+    - name: TASK - creating /etc/myhosts
+      ansible.builtin.template:
+        src: host.j2
+        dest: /etc/myhosts
+        owner: root
+        group: root
+        mode: '0644'
+      when: inventory_hostname in groups['dev']
