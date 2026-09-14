@@ -1,0 +1,32 @@
+- name: TASK - install packages
+  ansible.builtin.dnf:
+    name:
+      - httpd
+      - mod_ssl
+      - firewalld
+    state: present
+- name: TASK - copying index.html template
+  ansible.builtin.template:
+    src: index.html.j2
+    dest: /var/www/html/index.html
+    owner: apache
+    group: apache
+    mode: '0644'
+    setype: httpd_sys_content_t
+- name: TASK - start and enable services
+  ansible.builtin.service:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+  loop:
+    - firewalld
+    - httpd
+- name: TASK - allowing webservices to firewall
+  ansible.posix.firewalld:
+    service: "{{ item }}"
+    permanent: yes
+    state: enabled
+    immediate: yes
+  loop:
+    - http
+    - https
