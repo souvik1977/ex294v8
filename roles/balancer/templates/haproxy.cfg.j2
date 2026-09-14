@@ -4,12 +4,5 @@ frontend main
 
 backend webservers
     balance roundrobin
-{% for host in groups['webservers'] %}
-    {% set facts = hostvars[host] %}
-    {% set ip_data = facts.ansible_default_ipv4 | default(facts.ansible_facts.ansible_default_ipv4 | default(facts.ansible_facts.default_ipv4 | default(none))) %}
-    {% if ip_data is not none %}
-    server {{ host }} {{ ip_data.address }}:80 check
-    {% else %}
-    # WARNING: Could not resolve IP for {{ host }}
-    {% endif %}
-{% endfor %}
+server node3.lab.example.com 10.10.1.22:80 check
+server node4.lab.example.com 10.10.1.23:80 check

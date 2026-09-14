@@ -1,0 +1,15 @@
+frontend main
+    bind *:80
+    default_backend webservers
+
+backend webservers
+    balance roundrobin
+{% for host in groups['webservers'] %}
+    {% set facts = hostvars[host] %}
+    {% set ip_data = facts.ansible_default_ipv4 | default(facts.ansible_facts.ansible_default_ipv4 | default(facts.ansible_facts.default_ipv4 | default(none))) %}
+    {% if ip_data is not none %}
+    server {{ host }} {{ ip_data.address }}:80 check
+    {% else %}
+    # WARNING: Could not resolve IP for {{ host }}
+    {% endif %}
+{% endfor %}
