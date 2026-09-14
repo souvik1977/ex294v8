@@ -1,0 +1,19 @@
+---
+- name: Playbook to modify /etc/issue file
+  hosts: all
+  tasks:
+    - name: TASK - updating /etc/issue
+      ansible.builtin.copy:
+        content: |
+          {% if 'dev' in group_names %}
+          Development
+          {% elif 'test' in group_names %}
+          Test
+          {% elif 'prod' in group_names %}
+          Production
+          {% endif %}
+        dest: /etc/issue
+        mode: '0644'
+        owner: root
+        group: root
+      
