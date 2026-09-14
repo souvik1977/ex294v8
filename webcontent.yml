@@ -1,0 +1,53 @@
+---
+- name: Playbook to manage webcontent
+  hosts: dev
+  tasks:
+    - name: TASK - creating webdev group if not exists
+      ansible.builtin.group:
+        name: webdev
+        state: present
+    - name: TASK - installing required packages
+      ansible.builtin.dnf:
+        name:
+          - httpd
+          - mod_ssl
+          - firewalld
+        state: present
+    - name: TASK - start and enable services
+      ansible.builtin.service:
+        name: "{{ item }}"
+        state: started
+        enabled: true
+      loop:
+        - firewalld
+        - httpd
+    - name: TASK - allowing web services over firewall
+      ansible.posix.firewalld:
+        service: "{{ item }}"
+        state: enabled
+        permanent: true
+        immediate: true
+        offline: true
+      loop:
+        - http
+        - https
+    - name: TASK - creating /webdev directory
+      ansible.builtin.file:
+        path: /webdev
+        state: directory
+        group: webdev
+        mode: '2775'
+        setype: httpd_sys_content_t
+    - name: TASK - creating symbolic link
+      ansible.builtin.file:
+        src: /webdev
+        dest: /var/www/html/webdev
+        state: link
+        setype: httpd_sys_content_t
+    - name: TASK - creating index.html
+      ansible.builtin.copy:
+        content: Development
+        dest: /webdev/index.html
+        setype: httpd_sys_content_t
+        mode: '0644'
+        owner: apache
