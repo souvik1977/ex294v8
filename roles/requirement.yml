@@ -1,6 +1,0 @@
----
-roles:
-  - name: balancer
-    src: http://10.10.1.200/materials/haproxy.tar
-  - name: phpinfo
-    src: http://10.10.1.200/materials/phpinfo.tar

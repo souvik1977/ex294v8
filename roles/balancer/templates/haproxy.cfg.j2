@@ -1,8 +1,0 @@
-frontend main
-    bind *:80
-    default_backend webservers
-
-backend webservers
-    balance roundrobin
-server node3.lab.example.com 10.10.1.22:80 check
-server node4.lab.example.com 10.10.1.23:80 check

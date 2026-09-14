@@ -1,5 +1,0 @@
----
-- name: Playbook to configure apache using custom role
-  hosts: webservers
-  roles:
-    - apache
