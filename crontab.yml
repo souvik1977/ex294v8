@@ -1,0 +1,15 @@
+---
+- name: Playbook to create crontab
+  hosts: all
+  tasks:
+    - name: TASK - creating user student if does not exists
+      ansible.builtin.user:
+        name: student
+        state: present
+    - name: TASK - creating cronjob
+      ansible.builtin.cron:
+        name: ex294_cron
+        user: student
+        job: logger "EX294 in progress"
+        minute: "*/2"
+
