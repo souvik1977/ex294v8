@@ -1,0 +1,45 @@
+---
+- name: Playbook to manage logical volume
+  hosts: all
+  vars:
+    vg_name: research
+    lv_name: data
+    lv_size: 400
+    lv_alt_size: 300
+  tasks:
+    - name: TASK - check if VG 'research' exists else show error and stop
+      ansible.builtin.fail:
+        msg: "volume group does not exist"
+      when: ansible_facts['lvm']['vgs'][vg_name] is not defined
+
+    - name: Managing Logical volume
+      block:
+        - name: TASK - creating logical volume of size 1500M
+          community.general.lvol:
+            vg: "{{ vg_name }}"
+            lv: "{{ lv_name }}"
+            size: "{{ lv_size }}"
+            state: present
+          register: lv_400
+
+      rescue:
+        - name: TASK - showing message for insufficient space
+          ansible.builtin.debug:
+            msg: "Could not create logical volume of that size"
+
+        - name: TASK - creating logical volume of size 800M
+          community.general.lvol:
+            vg: "{{ vg_name }}"
+            lv: "{{ lv_name }}"
+            size: "{{ lv_alt_size }}"
+            state: present
+          register: lv_300
+
+      always:
+        - name: TASK - formatting the logical volume
+          community.general.filesystem:
+            fstype: ext4
+            dev: "/dev/{{ vg_name }}/{{ lv_name }}"
+            force: true
+          when: ( lv_400 is defined and lv_400.changed ) or ( lv_300 is defined and lv_300.changed )
+
