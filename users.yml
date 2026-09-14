@@ -1,0 +1,42 @@
+---
+- name: Playbook-1 to manager users on dev and test nodes
+  hosts: dev,test
+  vars_files:
+    - user_list.yml
+    - locker.yml
+  tasks:
+    - name: TASK - creating supplimentary group devops
+      ansible.builtin.group:
+        name: devops
+        state: present
+    - name: TASK - creating developer users
+      ansible.builtin.user:
+        name: "{{ item.username }}"
+        uid: "{{ item.uid }}"
+        state: present
+        groups: devops
+        append: true
+        password: "{{ PW_developer | password_hash('sha512') }}"
+      when: item.type == "developer"
+      loop: "{{ myusers }}"
+
+- name: Playbook-2 to manager users on prod nodes
+  hosts: prod
+  vars_files:
+    - user_list.yml
+    - locker.yml
+  tasks:
+    - name: TASK - creating supplimentary group opsmgr
+      ansible.builtin.group:
+        name: opsmgr
+        state: present
+    - name: TASK - creating developer users
+      ansible.builtin.user:
+        name: "{{ item.username }}"
+        uid: "{{ item.uid }}"
+        state: present
+        groups: opsmgr
+        append: true
+        password: "{{ PW_manager | password_hash('sha512') }}"
+      when: item.type == "manager"
+      loop: "{{ myusers }}"

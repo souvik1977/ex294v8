@@ -1,0 +1,19 @@
+---
+myusers:
+ - username: bob
+   type: developer
+   uid: 16001
+ - username: john
+   type: developer
+   uid: 16002
+ - username: alex
+   type: manager
+   uid: 10001
+ - username: kelly
+   type: manager
+   uid: 10002
+mygroups:
+  - groupname: devops
+    gid: 20000
+  - groupname: opsmgr
+    gid: 20001
